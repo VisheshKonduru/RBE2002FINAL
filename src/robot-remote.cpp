@@ -44,9 +44,7 @@ void Robot::HandleKeyCode(int16_t keyCode)
         switch(keyCode)
         {
             case REWIND:
-                jTarget = 2;
-                iTarget = 1;
-                EnterLineFollowing(20);
+                EnterLineFollowing(25);
                 keyString = "";
                 break;
             case NUM_1:
@@ -78,17 +76,16 @@ void Robot::HandleKeyCode(int16_t keyCode)
         switch(keyCode)
         {
             case UP_ARROW:
-                EnterCorrecting(1000);
-
+                chassis.SetTwist(5, 0);
                 break;
             case RIGHT_ARROW:
-                EnterTurn(0);
+                chassis.SetTwist(0, -0.25);
                 break;
             case DOWN_ARROW:
-                EnterTurn(3);
+                chassis.SetTwist(-5, 0);
                 break;
             case LEFT_ARROW:
-                EnterTurn(2);
+                chassis.SetTwist(0, 0.25);
                 break;
             case ENTER_SAVE:
                 chassis.SetTwist(0, 0);
@@ -105,17 +102,23 @@ void Robot::HandleKeyCode(int16_t keyCode)
         switch(keyCode)
         {
             case VOLminus:
-                k = keyString.toInt();
-                jGrid = k;
+                k = keyString.toInt() / 100.0;
+                Serial.print("Kp = "); Serial.println(k);
+                chassis.SetMotorKp(k);
                 keyString = "";
                 break;
             case PLAY_PAUSE:
-                k = keyString.toInt();
-                iGrid = k;
+                k = keyString.toInt() / 100.0;
+                Serial.print("Ki = "); Serial.println(k);
+                chassis.SetMotorKi(k);
                 keyString = "";
                 break;
             case VOLplus:
-                EnterLineFollowing(20);
+                k = keyString.toInt() / 100.0;
+                Serial.print("Kd = "); Serial.println(k);
+                chassis.SetMotorKd(k);
+                keyString = "";
+                break;
             case UP_ARROW:
                 if(!keyString.length()) chassis.SetWheelSpeeds(60, 0);
                 break;

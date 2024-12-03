@@ -26,11 +26,10 @@ LSM6::LSM6(void)
 // Public Methods //////////////////////////////////////////////////////////////
 #define KAPPA 0.01
 #define EPSILON 0.00005
-
 bool LSM6::checkForNewData(void)
 {
   bool retVal = false;
-  if((getStatus() & 0x02)>>1)
+  if(getStatus() & 0x01)
   {
     read();
 
@@ -228,11 +227,11 @@ void LSM6::enableDefault(void)
   if (_device == device_DS33)
   {
     // Set the gyro full scale and data rate
-    setFullScaleGyro(GYRO_FS1000);
-    setGyroDataOutputRate(ODR104);
+    setFullScaleGyro(GYRO_FS245);
+    setGyroDataOutputRate(ODR13);
 
     // Set the accelerometer full scale and data rate
-    setFullScaleAcc(ACC_FS16);
+    setFullScaleAcc(ACC_FS2);
     setAccDataOutputRate(ODR13);
 
     // Auto-increment

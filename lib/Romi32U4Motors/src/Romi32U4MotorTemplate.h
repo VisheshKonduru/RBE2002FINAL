@@ -24,6 +24,23 @@ protected:
     enum CTRL_MODE : uint8_t {CTRL_DIRECT, CTRL_SPEED};
     volatile CTRL_MODE ctrlMode = CTRL_DIRECT;
 
+    // TODO: After you tune your motors, set the gains here.
+    // float Kp = 0.5;
+    // float Ki = 0.05;
+    // float Kd = 0.02;
+
+    // float Kp = 4;
+    // float Ki = 1.2;
+    // float Kd = 0;
+
+    // float Kp = 10;
+    // float Ki = 0.5;
+    // float Kd = 0;
+
+
+    // float Kp = 2.5;
+    // float Ki = 0.125;
+    // float Kd = 0.2;
 
     float Kp = 8;
     float Ki = 2;

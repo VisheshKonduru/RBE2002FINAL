@@ -18,6 +18,7 @@ protected:
     };
     ROBOT_CTRL_MODE robotCtrlMode = CTRL_TELEOP;
 
+    EventTimer centeringTimer;
     /**
      * robotState is used to track the current task of the robot. You will add new states as 
      * the term progresses.
@@ -28,6 +29,8 @@ protected:
         ROBOT_LINING,
         ROBOT_TURNING,
         ROBOT_CORRECTING,
+        ROBOT_CENTERING,
+
     };
     ROBOT_STATE robotState = ROBOT_IDLE;
 
@@ -69,8 +72,25 @@ protected:
 
     uint8_t iGrid = 0;
     uint8_t jGrid = 0;
-    int8_t currDirection = 1; // EAST -> 0; NORTH -> 1; WEST = 2; SOUTH -> 3
+    int8_t startAngle = 90;
+    int8_t turnAngle = 0;
+    int8_t currDirection = 1;
     int8_t targetDirection = 1;
+    int turns = 0;
+    
+    
+    // EAST -> 0; NORTH -> 1; WEST = 2; SOUTH -> 3
+    //int8_t targetDirection = 1;
+
+    enum DIRECTION {
+        EAST,
+        NORTH,
+        WEST,
+        SOUTH,
+    };
+
+    // DIRECTION currDirection = NORTH;
+    
 
     //direction %= 4;
 
@@ -116,10 +136,15 @@ protected:
     void EnterTurn(int desiredTurns);
     bool CheckTurnComplete(void);
     void HandleTurnComplete(void);
+    bool CheckCenteringComplete(void);
+    void HandleCenteringComplete(void);
+
 
     /* IMU routines */
     void HandleOrientationUpdate(void);
 
     /* For commanding the lifter servo */
     void SetLifter(uint16_t position);
+
+    
 };
