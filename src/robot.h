@@ -27,6 +27,7 @@ protected:
         ROBOT_IDLE, 
         ROBOT_LINING,
         ROBOT_TURNING,
+        ROBOT_CORRECTING,
     };
     ROBOT_STATE robotState = ROBOT_IDLE;
 
@@ -38,6 +39,7 @@ protected:
 
     /* To add later: rangefinder, camera, etc.*/
     int16_t prevLineError = 0;
+
 
     // For managing key presses
     String keyString;
@@ -67,12 +69,19 @@ protected:
 
     uint8_t iGrid = 0;
     uint8_t jGrid = 0;
-    uint8_t direction = 1; // EAST -> 0; NORTH -> 1; WEST = 2; SOUTH -> 3
+    int8_t currDirection = 1; // EAST -> 0; NORTH -> 1; WEST = 2; SOUTH -> 3
+    int8_t targetDirection = 1;
+
     //direction %= 4;
 
     uint8_t iTarget = 0;
-    uint8_t jTarget = 0;
+    uint8_t jTarget = 3;
     int8_t numTurns = 0;
+    bool iReached = false;
+    bool jReached = false;
+
+    float currentTime = 0;
+    float targetTime = 0;   
 
 
     
@@ -101,8 +110,10 @@ protected:
 
     bool CheckIntersection(void) {return lineSensor.CheckIntersection();}
     void HandleIntersection(void);
+    void EnterCorrecting(int time);
+    void HandleCorrecting(void);
 
-    void EnterTurn(float angleInDeg);
+    void EnterTurn(int desiredTurns);
     bool CheckTurnComplete(void);
     void HandleTurnComplete(void);
 

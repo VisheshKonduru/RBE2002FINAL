@@ -12,12 +12,12 @@
 class LineSensor
 {
 protected:
-    uint8_t leftSensorPin = sensorPin1;
+    uint8_t firstSensorPin = sensorPin1;
     uint8_t secondSensorPin = sensorPin2;
     uint8_t thirdSensorPin = sensorPin3;
     uint8_t fourthSensorPin = sensorPin4;
     uint8_t fifthSensorPin = sensorPin5;
-    uint8_t rightSensorPin = sensorPin6;
+    uint8_t sixthSensorPin = sensorPin6;
 
 
     bool prevOnIntersection = false;

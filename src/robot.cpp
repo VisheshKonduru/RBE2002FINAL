@@ -32,10 +32,11 @@ void Robot::EnterIdleState(void)
     robotState = ROBOT_IDLE;
 }
 
+int turns = 0;
 /**
  * Functions related to the IMU (turning; ramp detection)
  */
-void Robot::EnterTurn(float angleInDeg)
+void Robot::EnterTurn(int desiredDirection)
 {
     Serial.println(" -> TURN");
     robotState = ROBOT_TURNING;
@@ -43,17 +44,43 @@ void Robot::EnterTurn(float angleInDeg)
     /**
      * TODO: Add code to initiate the turn and set the target
      */
+    targetDirection = desiredDirection;
+    turns =  (targetDirection - currDirection);
+
+    
+    if (turns >  0){
+        chassis.SetTwist(0,1);
+        targetHeading = eulerAngles.z + (abs(turns) * 90);
+    } else {
+        chassis.SetTwist(0,-1);
+        targetHeading = eulerAngles.z - (abs(turns) * 90);
+    }
+    
+    Serial.println(targetHeading);
 }
 
 bool Robot::CheckTurnComplete(void)
 {
-    bool retVal = false;
 
     /**
      * TODO: add a checker to detect when the turn is complete
      */
+    if (targetDirection - currDirection > 0){
+        if (eulerAngles.z > targetHeading){
+        return true;
+        Serial.println("checking");
+        } 
 
-    return retVal;
+    } else if (targetDirection - currDirection < 0){
+        if(eulerAngles.z < targetHeading) {
+            return true;
+            Serial.println("checking");
+        }
+
+    } else {
+        return false;
+    }
+
 }
 
 void Robot::HandleTurnComplete(void)
@@ -62,6 +89,16 @@ void Robot::HandleTurnComplete(void)
      * TODO: Add code to handle the completed turn
      * update direction based on the number of turns made
      */
+    Serial.println("turn completed");
+    currDirection = targetDirection;
+    turns = 0;
+    Serial.println(currDirection);
+    chassis.Stop();
+    EnterLineFollowing(20);
+    //EnterLineFollowing(10);
+    
+
+
 }
 
 /**
@@ -80,11 +117,28 @@ void Robot::HandleOrientationUpdate(void)
 
     else // update orientation
     {
-        // TODO: update the orientation
+        eulerAngles.z =  prevEulerAngles.z + ((imu.g.z - imu.gyroBias.z) * (1.0 / imu.gyroODR) * (imu.mdpsPerLSB / 1000));
+        eulerAngles.y =  prevEulerAngles.y + ((imu.g.y - imu.gyroBias.y) * (1.0 / imu.gyroODR) * (imu.mdpsPerLSB / 1000));
+        eulerAngles.x =  prevEulerAngles.x + ((imu.g.x - imu.gyroBias.x) * (1.0 / imu.gyroODR) * (imu.mdpsPerLSB / 1000));
+        // Serial.println(eulerAngles.z);
     }
 
 #ifdef __IMU_DEBUG__
-    Serial.println(eulerAngles.z);
+    // Serial.print(imu.g.x);
+    // Serial.print('\t');
+    // Serial.print(imu.g.y);
+    // Serial.print('\t');
+    // Serial.print(imu.g.z);
+    // Serial.print('\t');
+    // Serial.print(millis());
+    // Serial.print('\n');
+
+    Serial.print(eulerAngles.x);
+    Serial.print('\t');
+    Serial.print(eulerAngles.y);
+    Serial.print('\t');
+    Serial.print(eulerAngles.z);
+    Serial.print('\n');
 #endif
 }
 
@@ -105,12 +159,14 @@ void Robot::LineFollowingUpdate(void)
         // TODO: calculate the error in CalcError(), calc the effort, and update the motion
         float lineError = lineSensor.CalcError();
 
-        float turnEffort = 1 * ((lineError * 2.25) + (0.25 * (lineError - prevLineError)));
+        float turnEffort = 1 * ((lineError * 0.5) + (0.1 * (lineError - prevLineError)));
         prevLineError = lineError;
 
-        
 
-        chassis.SetTwist(baseSpeed, turnEffort);
+        chassis.SetTwist(baseSpeed, turnEffort);        
+    }
+    if(robotState == ROBOT_CORRECTING){
+        HandleCorrecting();
     }
 }
 
@@ -120,63 +176,84 @@ void Robot::LineFollowingUpdate(void)
  */
 void Robot::HandleIntersection(void)
 {
-    Serial.print("X: ");
+
     if(robotState == ROBOT_LINING) 
     {
+        Serial.println("detected");
+
         //update location
-        if(direction == 0) iGrid++;
-        //else if 
+        if(currDirection == 0){
+            iGrid++;
+        }
+        else if (currDirection == 1){
+            jGrid++;
+        } else if (currDirection == 2){
+            iGrid--;
+        } 
+        else if (currDirection == 3){
+            jGrid--;
+        }
 
 
 
+        
+        if (jGrid == jTarget && !jReached ){
+            jReached = true;
+            EnterCorrecting(1000);
+            //EnterTurn(3);
+            Serial.print(jGrid);
+            Serial.print(jReached);
+        } else if (jGrid != jTarget && !jReached){// reaches end, turns
+            EnterLineFollowing(20);
+        }  else if (jGrid == jTarget && jReached){
+            
+            if (iGrid == iTarget && !iReached ){
+                iReached = true;
+                EnterCorrecting(1000);
+                Serial.print(iGrid);
+                Serial.print(iReached);
+            } else if (iGrid != iTarget && !iReached){// reaches end, turns
+                EnterLineFollowing(20);
+            }  else if (iGrid == iTarget && iReached){
+                EnterTurn(2);
+            }
+
+        }
+
+        
 
 
-        // switch(nodeTo)
-        // {
-        //     case NODE_START:
-        //         if(nodeFrom == NODE_1)
-        //             EnterIdleState();
-            //     break;
-            // case NODE_1:
-            //     // By default, we'll continue on straight
-            //     if(nodeFrom == NODE_START) 
-            //     {
-            //         nodeTo = NODE_2;
-            //     }
-            //     else if(nodeFrom == NODE_2)
-            //     {
-            //         nodeTo = NODE_START;
-            //     }
-            //     nodeFrom = NODE_1;
-            //     break;
-            // case NODE_2:
-            //     // By default, we'll continue on straight
-            //     if(nodeFrom == NODE_1) 
-            //     {
-            //         nodeTo = NODE_3;
-            //     }
-            //     else if(nodeFrom == NODE_3)
-            //     {
-            //         nodeTo = NODE_1;
-            //     }
-        //         nodeFrom = NODE_2;
-        //         break;
-        //     case NODE_3:
-        //         // By default, we'll bang a u-ey
-        //         if(nodeFrom == NODE_2) 
-        //         {
-        //             nodeTo = NODE_2;
-        //             nodeFrom = NODE_3;
-        //             EnterTurn(180);
-        //         }
-        //         break;
-        //     default:
-        //         break;
-        // }
-        // Serial.print(nodeFrom);
-        // Serial.print("->");
-        // Serial.print(nodeTo);
-        // Serial.print('\n');
+    }else{
+        if(iGrid < iTarget){
+            EnterTurn(0);
+        }else if (iGrid == 0 && jGrid == 0 && iReached && jReached){
+            EnterIdleState();
+        } else if (iGrid == iTarget && iReached){
+            jTarget = 0;
+            jReached = false;
+            iReached = false;
+            EnterTurn(3);
+        } else if(jGrid == jTarget){
+            iTarget = 0;
+            iReached = false;
+            EnterTurn(2);
+        }
+    }
+}
+
+void Robot::EnterCorrecting(int time){
+    robotState = ROBOT_CORRECTING;
+    targetTime = millis() + time;
+    HandleCorrecting();
+}
+void Robot::HandleCorrecting(void){
+    
+    if(currentTime < targetTime){
+        chassis.SetWheelSpeeds(10,10);
+        currentTime = millis();
+    } else {
+        chassis.SetWheelSpeeds(0,0);
+        HandleIntersection();
     }
 }
 
@@ -193,6 +270,7 @@ void Robot::RobotLoop(void)
     int16_t keyCode = decoder.getKeyCode();
     if(keyCode != -1) HandleKeyCode(keyCode);
     
+    //Serial.println(lineSensor.CheckIntersection());
 
     /**
      * Check the Chassis timer, which is used for executing motor control
@@ -200,6 +278,10 @@ void Robot::RobotLoop(void)
     if(chassis.CheckChassisTimer())
     {
         // add synchronous, pre-motor-update actions here
+        if(robotState == ROBOT_CORRECTING){
+            
+            HandleCorrecting();
+        }
         if(robotState == ROBOT_LINING)
         {
             LineFollowingUpdate();
@@ -214,7 +296,10 @@ void Robot::RobotLoop(void)
     /**
      * Check for any intersections
      */
-    if(lineSensor.CheckIntersection()) HandleIntersection();
+    if(lineSensor.CheckIntersection()){
+        HandleIntersection();
+    } 
+
 
     /**
      * Check for an IMU update
@@ -225,5 +310,7 @@ void Robot::RobotLoop(void)
         if(CheckTurnComplete()) HandleTurnComplete();
 
     }
+
+    
 }
 
