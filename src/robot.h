@@ -2,6 +2,7 @@
 #include "chassis.h"
 #include <LineSensor.h>
 #include <LSM6.h>
+#include <Romi32U4Buttons.h>
 
 class Robot
 {
