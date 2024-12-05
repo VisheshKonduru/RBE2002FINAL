@@ -188,15 +188,16 @@ void Robot::HandleIntersection(void)
 
 /* UART Handle for messages*/
 void Robot::HandleUARTMessage(const String& message) {
-    // parses and handles our messages
-    Serial.println("processing message: " + message);
+  Serial.println("Processing message: " + message);
 
-    //Example 
-    if (message == "START") {
-        EnterLineFollowing(25); //Starts robot linefollowing @25
-    } else if (message == "STOP") {
-        EnterIdleState(); //Stops robot
-    }
+  if (message == "Start") {
+    EnterLineFollowing(25); // Start line following
+  } else if (message == "Stop") {
+    EnterIdleState(); // Stop the robot
+  } else if (message == "Button Pressed") {
+    // Handle button press from ESP32
+    Serial.println("ESP32 Button Pressed");
+  }
 }
 
 void Robot::RobotLoop(void) 
@@ -252,6 +253,9 @@ void Robot::RobotLoop(void)
         Serial.println("received via UART: " + incomingMessage);
         // process the message
         HandleUARTMessage(incomingMessage);
+
+        //sending message back to ESP32
+        uart.sendMessage("romi status messaging");
     }
 }
 

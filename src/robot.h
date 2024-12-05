@@ -113,6 +113,9 @@ protected:
 
     /* For commanding the lifter servo */
     void SetLifter(uint16_t position);
+    
+    
+    /*UARTCODE*/
     void HandleUARTMessage(const String& message);
 
     UARTComm uart; // For communicating with the PC
