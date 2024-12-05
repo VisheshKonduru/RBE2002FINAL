@@ -170,3 +170,32 @@ public:
 protected:
     void writeMicroseconds(uint16_t microseconds);
 };
+
+
+//class for Servo32U4pin9
+
+class Servo32U4Pin9
+{
+public:
+    void attach(void);
+    void detach(void);
+    void writeMicroseconds(uint16_t microseconds);
+
+private:
+    bool isAttached = false;
+    const uint16_t usMin = 544;
+    const uint16_t usMax = 2400;
+};
+
+class Servo32U4Pin10
+{
+public:
+    void attach(void);
+    void detach(void);
+    void writeMicroseconds(uint16_t microseconds);
+
+private:
+    bool isAttached = false;
+    const uint16_t usMin = 544;
+    const uint16_t usMax = 2400;
+};

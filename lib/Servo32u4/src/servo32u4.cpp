@@ -171,3 +171,91 @@ void Servo32U4Pin12::writeMicroseconds(uint16_t microseconds)
     //prescaler is 8, so 1 timer count = 64 us
     OCR4D = 250 - (microseconds >> 6) - 1; // divides by 64
 }
+
+
+
+
+
+void Servo32U4Pin9::attach(void)
+{
+    pinMode(9, OUTPUT);
+
+    cli();
+
+    // Configure Timer1 for Fast PWM on Pin 9 (OCR1A)
+    TCCR1A |= (1 << COM1A1) | (1 << WGM11);  // Non-inverting mode, Fast PWM
+    TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS11); // Prescaler = 8
+    ICR1 = 40000; // Set TOP for 20ms period (50Hz)
+
+    sei();
+
+    isAttached = true;
+}
+
+void Servo32U4Pin9::detach(void)
+{
+    cli();
+
+    // Disconnect PWM and stop Timer1
+    TCCR1A &= ~(1 << COM1A1);
+    TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));
+
+    sei();
+
+    isAttached = false;
+}
+
+void Servo32U4Pin9::writeMicroseconds(uint16_t microseconds)
+{
+    if (!isAttached)
+    {
+        attach();
+    }
+
+    microseconds = constrain(microseconds, usMin, usMax);
+
+    // Calculate the OCR1A value for the desired pulse width
+    OCR1A = (microseconds * 2);
+}
+
+void Servo32U4Pin10::attach(void)
+{
+    pinMode(10, OUTPUT);
+
+    cli();
+
+    // Configure Timer1 for Fast PWM on Pin 10 (OCR1B)
+    TCCR1A |= (1 << COM1B1) | (1 << WGM11);  // Non-inverting mode, Fast PWM
+    TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS11); // Prescaler = 8
+    ICR1 = 40000; // Set TOP for 20ms period (50Hz)
+
+    sei();
+
+    isAttached = true;
+}
+
+void Servo32U4Pin10::detach(void)
+{
+    cli();
+
+    // Disconnect PWM and stop Timer1
+    TCCR1A &= ~(1 << COM1B1);
+    TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));
+
+    sei();
+
+    isAttached = false;
+}
+
+void Servo32U4Pin10::writeMicroseconds(uint16_t microseconds)
+{
+    if (!isAttached)
+    {
+        attach();
+    }
+
+    microseconds = constrain(microseconds, usMin, usMax);
+
+    // Calculate the OCR1B value for the desired pulse width
+    OCR1B = (microseconds * 2);
+}

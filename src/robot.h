@@ -2,6 +2,9 @@
 #include "chassis.h"
 #include <LineSensor.h>
 #include <LSM6.h>
+#include "servo32u4.h"
+#include "RomiMotor.h"
+#include <Arduino.h>
 
 class Robot
 {
@@ -111,4 +114,8 @@ protected:
 
     /* For commanding the lifter servo */
     void SetLifter(uint16_t position);
+
+    /*initializing the drive esc*/
+    void initESC();
+    RomiMotor motor;
 };

@@ -1,9 +1,16 @@
 #include "robot.h"
 #include <IRdecoder.h>
+#include <servo32u4.h>
+#include "Romimotor.h"
 
 void Robot::InitializeRobot(void)
 {
+    Serial.println("Starting Robot Initialization...");
+
     chassis.InititalizeChassis();
+
+    // Initialize the ESCs for the motors
+    motor.initESC();
 
     /**
      * Initialize the IR decoder. Declared extern in IRdecoder.h; see robot-remote.cpp
@@ -22,6 +29,8 @@ void Robot::InitializeRobot(void)
 
     // The line sensor elements default to INPUTs, but we'll initialize anyways, for completeness
     lineSensor.Initialize();
+
+    Serial.println("Robot Initialization Complete.");
 }
 
 void Robot::EnterIdleState(void)
@@ -225,5 +234,35 @@ void Robot::RobotLoop(void)
         if(CheckTurnComplete()) HandleTurnComplete();
 
     }
-}
+     // Motor control logic using non-blocking timing
+    static uint32_t lastMotorUpdate = 0;
+    static bool motorActive = false;
+    static uint32_t motorStartTime = 0;
+    uint32_t currentTime = millis();
 
+    if (!motorActive && (currentTime - lastMotorUpdate >= 5000))  // Check every 5 seconds
+    {
+        lastMotorUpdate = currentTime;
+
+        // Set the motor speed to full forward
+        motor.setSpeed(100);  // Full forward
+
+        // Start the motor
+        motorActive = true;
+        motorStartTime = currentTime;
+
+        Serial.println("Motor started.");
+    }
+
+    if (motorActive && (currentTime - motorStartTime >= 9000))  // Run for 9 seconds
+    {
+        // Stop the motor
+        motor.setSpeed(0);
+
+        motorActive = false;
+
+        Serial.println("Motor stopped.");
+    }
+
+    // Add other loop-related code here
+}

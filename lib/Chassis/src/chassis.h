@@ -37,6 +37,7 @@ public:
     {
         InitializeMotorControlTimer();
         InitializeMotors();
+        
     }
 
     void SetMotorKp(float kp);
