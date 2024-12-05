@@ -2,6 +2,7 @@
 #include "chassis.h"
 #include <LineSensor.h>
 #include <LSM6.h>
+#include "romimotor.h"
 
 class Robot
 {
@@ -111,4 +112,9 @@ protected:
 
     /* For commanding the lifter servo */
     void SetLifter(uint16_t position);
+
+    RomiServoPin9 motor1;
+    RomiServoPin10 motor2;
+
+    int motorSpeed;
 };

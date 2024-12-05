@@ -22,6 +22,19 @@ void Robot::InitializeRobot(void)
 
     // The line sensor elements default to INPUTs, but we'll initialize anyways, for completeness
     lineSensor.Initialize();
+
+    motorSpeed = 1500;
+
+    motor1.attach();
+    motor2.attach();
+    // arm ESC
+    motor1.writeMicroseconds(1000);
+    motor2.writeMicroseconds(1000);
+    delay(2000);
+
+    //set motor speed
+    motor1.writeMicroseconds(motorSpeed);
+    motor2.writeMicroseconds(motorSpeed);
 }
 
 void Robot::EnterIdleState(void)
@@ -210,7 +223,28 @@ void Robot::RobotLoop(void)
         // add synchronous, post-motor-update actions here
 
     }
+     static unsigned long lastUpdate = 0;
+    unsigned long currentTime = millis();
 
+    if (currentTime - lastUpdate >= 1000) // Every 1 second
+    {
+        lastUpdate = currentTime;
+
+        // Adjust motorSpeed as neededi
+        // For example, increase speed gradually
+        motorSpeed += 100;
+        if (motorSpeed > 2000)
+        {
+            motorSpeed = 1000; // Reset to minimum
+        }
+
+        // Update motor speeds
+        motor1.writeMicroseconds(motorSpeed);
+        motor2.writeMicroseconds(motorSpeed);
+
+        Serial.print("Motor Speed Updated to: ");
+        Serial.println(motorSpeed);
+    }
     /**
      * Check for any intersections
      */

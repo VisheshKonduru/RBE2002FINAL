@@ -21,6 +21,7 @@ protected:
 public:
     virtual void attach(void) = 0;
     virtual void detach(void) = 0;
+    
 
     uint16_t setMinMaxMicroseconds(uint16_t min, uint16_t max)
     {
@@ -43,8 +44,6 @@ class RomiServoPin9 : public RomiServoBase
 public:
     void attach(void);
     void detach(void);
-
-protected:
     void writeMicroseconds(uint16_t microseconds);
 };
 
@@ -53,7 +52,6 @@ class RomiServoPin10 : public RomiServoBase
 public:
     void attach(void);
     void detach(void);
-
-protected:
     void writeMicroseconds(uint16_t microseconds);
+
 };
