@@ -71,7 +71,7 @@ protected:
     // INTERSECTION nodeFrom = NODE_START;
     // INTERSECTION nodeTo = NODE_1;
 
-    uint8_t iGrid = 0;
+    uint8_t iGrid = 1;
     uint8_t jGrid = 0;
     int8_t startAngle = 90;
     int8_t turnAngle = 0;
@@ -96,7 +96,7 @@ protected:
     //direction %= 4;
 
     uint8_t iTarget = 0;
-    uint8_t jTarget = 3;
+    uint8_t jTarget = 0;
     int8_t numTurns = 0;
     bool iReached = false;
     bool jReached = false;
