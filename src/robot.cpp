@@ -203,61 +203,85 @@ void Robot::RobotLoop(void)
     /**
      * Handle any IR remote keypresses.
      */
-    int16_t keyCode = decoder.getKeyCode();
-    if(keyCode != -1) HandleKeyCode(keyCode);
+    // int16_t keyCode = decoder.getKeyCode();
+    // if(keyCode != -1) HandleKeyCode(keyCode);
     
+    //  static bool escCalibrated = false;
+    // if (!escCalibrated)
+    // {
+    //     // Send maximum throttle
+    //     motorSpeed = 2000; 
+    //     motor1.writeMicroseconds(motorSpeed);
+    //     motor2.writeMicroseconds(motorSpeed);
+    //     delay(2000); // Wait for 2 seconds
+
+    //     // Send minimum throttle
+    //     motorSpeed = 1000; 
+    //     motor1.writeMicroseconds(motorSpeed);
+    //     motor2.writeMicroseconds(motorSpeed);
+    //     delay(2000); // Wait for 2 seconds
+
+    //     escCalibrated = true;
+    // }
+
+    // Set to neutral throttle after calibration
+    motorSpeed = 1650; 
+    motor1.writeMicroseconds(motorSpeed);
+    motor2.writeMicroseconds(motorSpeed);
+
+    Serial.print("Motor Speed Set to: ");
+    Serial.println(motorSpeed);
+
+    delay(1000); // Wait to observe behavior
+
 
     /**
      * Check the Chassis timer, which is used for executing motor control
      */
-    if(chassis.CheckChassisTimer())
-    {
-        // add synchronous, pre-motor-update actions here
-        if(robotState == ROBOT_LINING)
-        {
-            LineFollowingUpdate();
-        }
+    // if(chassis.CheckChassisTimer())
+    // {
+    //     // add synchronous, pre-motor-update actions here
+    //     if(robotState == ROBOT_LINING)
+    //     {
+    //         LineFollowingUpdate();
+    //     }
 
-        chassis.UpdateMotors();
+    //     chassis.UpdateMotors();
 
         // add synchronous, post-motor-update actions here
 
     }
-     static unsigned long lastUpdate = 0;
-    unsigned long currentTime = millis();
+    //  static unsigned long lastUpdate = 0;
+    // unsigned long currentTime = millis();
 
-    if (currentTime - lastUpdate >= 1000) // Every 1 second
-    {
-        lastUpdate = currentTime;
+    // if (currentTime - lastUpdate >= 1000) // Every 1 second
+    // {
+    //     lastUpdate = currentTime;
 
-        // Adjust motorSpeed as neededi
-        // For example, increase speed gradually
-        motorSpeed += 100;
-        if (motorSpeed > 2000)
-        {
-            motorSpeed = 1000; // Reset to minimum
-        }
+    //     // Adjust motorSpeed as neededi
+    //     // For example, increase speed gradually
+    //     motorSpeed = 100; 
 
-        // Update motor speeds
-        motor1.writeMicroseconds(motorSpeed);
-        motor2.writeMicroseconds(motorSpeed);
+    //     // Update motor speeds
+    //     motor1.writeMicroseconds(motorSpeed);
+    //     motor2.writeMicroseconds(motorSpeed);
 
-        Serial.print("Motor Speed Updated to: ");
-        Serial.println(motorSpeed);
-    }
+    //     Serial.print("Motor Speed Updated to: ");
+    //     Serial.println(motorSpeed);
+    // }
     /**
      * Check for any intersections
-     */
-    if(lineSensor.CheckIntersection()) HandleIntersection();
+//      */
+//     if(lineSensor.CheckIntersection()) HandleIntersection();
 
-    /**
-     * Check for an IMU update
-     */
-    if(imu.checkForNewData())
-    {
-        HandleOrientationUpdate();
-        if(CheckTurnComplete()) HandleTurnComplete();
+//     /**
+//      * Check for an IMU update
+//      */
+//     if(imu.checkForNewData())
+//     {
+//         HandleOrientationUpdate();
+//         if(CheckTurnComplete()) HandleTurnComplete();
 
-    }
-}
+//     }
+// }
 

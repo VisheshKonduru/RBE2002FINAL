@@ -39,7 +39,7 @@ void RomiServoPin9::writeMicroseconds(uint16_t microseconds)
     microseconds = constrain(microseconds, usMin, usMax);
 
     // For 16MHz clock and prescaler of 8, each timer tick is 0.5 us
-    uint16_t dutyCycle = microseconds * 2; // Convert microseconds to timer ticks
+    uint16_t dutyCycle = (microseconds * 2); // Convert microseconds to timer ticks
     OCR1A = dutyCycle;
 }
 
@@ -81,6 +81,6 @@ void RomiServoPin10::writeMicroseconds(uint16_t microseconds)
     microseconds = constrain(microseconds, usMin, usMax);
 
     // For 16MHz clock and prescaler of 8, each timer tick is 0.5 us
-    uint16_t dutyCycle = microseconds * 2; // Convert microseconds to timer ticks
+    uint16_t dutyCycle = (microseconds * 2); // Convert microseconds to timer ticks
     OCR1B = dutyCycle;
 }
