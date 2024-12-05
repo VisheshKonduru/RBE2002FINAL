@@ -23,6 +23,9 @@ void Robot::InitializeRobot(void)
 
     // The line sensor elements default to INPUTs, but we'll initialize anyways, for completeness
     lineSensor.Initialize();
+
+    /*Uart communications*/
+    uart.begin(115200);
 }
 
 void Robot::EnterIdleState(void)
@@ -115,6 +118,8 @@ void Robot::LineFollowingUpdate(void)
     }
 }
 
+
+
 /**
  * As coded, HandleIntersection will make the robot drive out 3 intersections, turn around,
  * and stop back at the start. You will need to change the behaviour accordingly.
@@ -181,6 +186,19 @@ void Robot::HandleIntersection(void)
     }
 }
 
+/* UART Handle for messages*/
+void Robot::HandleUARTMessage(const String& message) {
+    // parses and handles our messages
+    Serial.println("processing message: " + message);
+
+    //Example 
+    if (message == "START") {
+        EnterLineFollowing(25); //Starts robot linefollowing @25
+    } else if (message == "STOP") {
+        EnterIdleState(); //Stops robot
+    }
+}
+
 void Robot::RobotLoop(void) 
 {
     /**
@@ -225,6 +243,15 @@ void Robot::RobotLoop(void)
         HandleOrientationUpdate();
         if(CheckTurnComplete()) HandleTurnComplete();
 
+    }
+
+
+    /*handling our UART communcations*/
+    String incomingMessage;
+    if (uart.receiveMessage(incomingMessage)) {
+        Serial.println("received via UART: " + incomingMessage);
+        // process the message
+        HandleUARTMessage(incomingMessage);
     }
 }
 

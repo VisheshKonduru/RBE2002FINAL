@@ -3,6 +3,7 @@
 #include <LineSensor.h>
 #include <LSM6.h>
 #include <Romi32U4Buttons.h>
+#include "uart_comm.h"
 
 class Robot
 {
@@ -112,4 +113,7 @@ protected:
 
     /* For commanding the lifter servo */
     void SetLifter(uint16_t position);
+    void HandleUARTMessage(const String& message);
+
+    UARTComm uart; // For communicating with the PC
 };
