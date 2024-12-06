@@ -1,8 +1,6 @@
 // uart_comm.cpp
 #include "uart_comm.h"
 
-#include "uart_comm.h"
-
 void UARTComm::begin(unsigned long baudRate) {
   Serial1.begin(baudRate);
 }
