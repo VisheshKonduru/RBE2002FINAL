@@ -135,6 +135,7 @@ protected:
 
     /* State changes */    
     void EnterIdleState(void);
+    void Setup(void);
 
     /* Mode changes */
     void EnterTeleopMode(void);

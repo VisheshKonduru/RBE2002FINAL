@@ -1,7 +1,21 @@
 #include "robot.h"
-#include "OpenMV.h"
-#include <Arduino.h>
 
+#include <Arduino.h>
+#include <Wire.h>
+#include <OpenMV.h>
+
+
+#define CAMERA_ADDRESS 0x12 // I2C address of the OpenMV camera
+#define SDA_PIN 2
+#define SCL_PIN 3
+
+
+void Robot::Setup(){
+    Wire.begin();
+    camera.begin();
+
+
+}
 
 void Robot::HandleAprilTag(const AprilTagDatum& tag)
 {
@@ -109,57 +123,49 @@ bool Robot::CheckApproachComplete(int headingTolerance, int distanceTolerance)
     return isCloseEnough;
 }
 
-void Robot::ApproachTag(void)
-{
-    if(!tagDetected)
-    {
-        //not tage detected, robot stops and goes back to searching 
+void Robot::ApproachTag() {
+    // Check if any AprilTags are detected
+    uint8_t tagCount = camera.getTagCount();
+    if (tagCount > 0) {
+        AprilTagDatum tag;
+        if (camera.readTag(tag)) {
+            // Extract tag information
+            int tagID = tag.id;
+            int centerX = tag.cx;
+            int centerY = tag.cy;
+
+            // Desired position is the center of the camera frame
+            const int desiredX = 80; // Adjust based on camera resolution
+
+            // Calculate the error in the X-axis
+            int errorX = centerX - desiredX;
+
+            // Calculate the twist using proportional control
+            float twist = approachKp * errorX;
+
+            // Set a constant forward speed
+            float forwardSpeed = -7; // Adjust as needed
+
+            // Update the chassis motion
+            chassis.SetTwist(forwardSpeed, twist);
+
+            // Optional: Print debug information
+            // Serial.print("Approaching tag ID ");
+            // Serial.print(tagID);
+            // Serial.print(": Forward Speed = ");
+            // Serial.print(forwardSpeed);
+            // Serial.print(", Twist = ");
+            // Serial.println(twist);
+        } else {
+            // Failed to read tag data
+            chassis.SetTwist(0, 0);
+            EnterSearchingState();
+        }
+    } else {
+        // No tags detected
         chassis.SetTwist(0, 0);
-
-        //trasition to our searching state
         EnterSearchingState();
-        return;
     }
-
-    //Desired Position is center to camera Fram
-    const int desiredX = 80;
-
-    // Calculate the error in the X-Axis
-    int errorX = currentTag.cx - desiredX;
-
-    // Calculate the twist using Prop control
-    float twist = approachKp * errorX; // neg to correct direction towards tag
-
-    // Limit the twist to max NOT FUCKING WORKING
-    //if(twist > maxApproachSpeed) twist = maxApproachSpeed;
-    //else if(twist < -maxApproachSpeed) twist = -maxApproachSpeed;
-
-    // set const forward speed 
-    float forwardSpeed = -7;
-
-    //Update the chassis motion
-    chassis.SetTwist(forwardSpeed, twist);
-
-    Serial.print("Approaching: Forward Speed =");
-    Serial.print(forwardSpeed);
-    Serial.print(", Twist =");
-    Serial.print(twist);
-
-    chassis.UpdateMotors();
-
-    // check if our robot is close enough to tag
-    if (CheckApproachComplete(20, 5000))
-{
-    // Stop our robot
-    chassis.SetTwist(0, 0);
-    chassis.UpdateMotors();
-
-
-    // Transition to IDLE 
-    EnterIdleState();
-
-    Serial.println("Approach Complete");
-}
 }
 
 
