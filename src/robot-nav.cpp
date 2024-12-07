@@ -1,4 +1,4 @@
-// #include "robot.h"
+// // #include "robot.h"
 
 
 
@@ -42,15 +42,33 @@
 
 
 
-// // /**
-// //  * Functions related to the IMU (turning; ramp detection)
-// //  */
-// // // void Robot::EnterTurn(int turns)
-// // // {
-// // //     Serial.print("--> TURN (");
-// // //     Serial.print(turns);
-// // //     Serial.println(')');
-// // //     robotState = ROBOT_TURNING;
+// // // /**
+// // //  * Functions related to the IMU (turning; ramp detection)
+// // //  */
+// // // // void Robot::EnterTurn(int turns)
+// // // // {
+// // // //     Serial.print("--> TURN (");
+// // // //     Serial.print(turns);
+// // // //     Serial.println(')');
+// // // //     robotState = ROBOT_TURNING;
+
+// //     startAngle = eulerAngles.z;
+// //     turnAngle = 90 * turns;
+// //     if(turns > 0)
+// //     {
+// //         chassis.SetTwist(0, 0.5);
+// //     }
+
+// //     else if(turns < 0)
+// //     {
+// //         chassis.SetTwist(0, -0.5);
+// //     }
+// // }
+
+// void Robot::EnterTurn(int desiredDirection)
+// {
+//     Serial.println(" -> TURN");
+//     robotState = ROBOT_TURNING;
 
 // // //     startAngle = eulerAngles.z;
 // // //     turnAngle = 90 * turns;
@@ -85,8 +103,8 @@
 // //         targetHeading = eulerAngles.z - (abs(turns) * 90);
 // //     }
     
-// //     Serial.println(targetHeading);
-// // }
+    Serial.println(targetHeading);
+}
 
 // // // // Now a proper checker...
 // // // bool Robot::CheckTurnComplete(void)

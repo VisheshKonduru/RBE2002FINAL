@@ -3,6 +3,9 @@
 #include <LineSensor.h>
 #include <LSM6.h>
 #include <Romi32U4Buttons.h>
+#include <OpenMV.h>
+#include <apriltagdatum.h>
+#include <event_timer.h>
 
 class Robot
 {
@@ -31,6 +34,8 @@ protected:
         ROBOT_TURNING,
         ROBOT_CORRECTING,
         ROBOT_CENTERING,
+        ROBOT_SEARCHING,    // these are for camera code
+        ROBOT_APPROACHING, // these are both for camera code
 
     };
     ROBOT_STATE robotState = ROBOT_IDLE;
@@ -104,7 +109,20 @@ protected:
     float currentTime = 0;
     float targetTime = 0;   
 
+    // // camera shit 
+    int detectedTagID; // var to store tag ID
+    AprilTagDatum currentTag; //stores latest detected tag
+    bool tagDetected = false; //flag to indicate if a tag has been stored 
 
+    //PID for approaching state 
+    float approachKp = 0.014;
+    float maxApproachSpeed = 0.5;
+
+    // new members for non-blocking
+    unsigned long previousMillis;
+    const long interval = 500;
+    int blinkCount;
+    int tagID;
     
 public:
     Robot(void) {keyString.reserve(8);} //reserve some memory to avoid reallocation
@@ -117,6 +135,7 @@ protected:
 
     /* State changes */    
     void EnterIdleState(void);
+    void Setup(void);
 
     /* Mode changes */
     void EnterTeleopMode(void);
@@ -140,6 +159,18 @@ protected:
     bool CheckCenteringComplete(void);
     void HandleCenteringComplete(void);
 
+
+
+    // /*All camera shit */
+    void HandleAprilTag(const AprilTagDatum& tag);
+    void ApproachTag (void);
+    void EnterSearchingState(void);
+    void EnterApproachingState(void);
+    bool CheckApproachComplete(int headingTolerance, int distanceTolerance);
+
+    OpenMV openMV;
+    EventTimer tagLossTimer;
+    const unsigned long tagLossTimeout = 1000; 
 
     /* IMU routines */
     void HandleOrientationUpdate(void);
