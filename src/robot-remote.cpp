@@ -4,9 +4,12 @@
  * the code that isn't needed later in the term.
  */
 #include "robot.h"
-
+#include <Arduino.h>
 #include <ir_codes.h>
 #include <IRdecoder.h>
+#include "Pathfinding.h"
+
+Pathfinding pathfinder;
 
 /**
  * IRDecoder decoder is declared extern in IRdecoder.h (for ISR purposes), 
@@ -44,9 +47,10 @@ void Robot::HandleKeyCode(int16_t keyCode)
         switch(keyCode)
         {
             case REWIND:
-                jTarget = 2;
-                iTarget = 1;
-                EnterLineFollowing(20);
+                // jTarget = 2;
+                // iTarget = 1;
+                // EnterLineFollowing(20);
+                pathfinder.findPath(1, 0, 2, 4);
                 keyString = "";
                 break;
             case NUM_1:
